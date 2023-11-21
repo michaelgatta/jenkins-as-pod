@@ -1,6 +1,7 @@
 pipeline {
     agent {
         kubernetes {
+            label 'jenkins'
             inheritFrom 'jenkins'
             idleMinutes 5
             yamlFile 'build-pod.yaml'
