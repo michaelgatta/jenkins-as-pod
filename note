@@ -1,0 +1,44 @@
+Build an image
+Push the image to AWS ECR
+	- Create AWS ECR repository
+			aws ecr create-repository --repository-name <repoName> 
+	
+	- Create AWS S3 bucket
+	- Create AWS DynamoDB
+
+
+	aws ecr get-login-password \
+    --region <region> | docker login \
+		--username AWS \
+		--password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+
+AWS access id & secret
+
+	aws configure get aws_access_key_id
+
+	aws configure get aws_secret_access_key
+
+
+    my note
+    ****************************************************************************************************************************************************************************************************************************************
+    create function <def> to return status to be true
+    *s3
+    *dynamo
+    *erc
+
+    create environment
+    *AWS_DEFAULT_REGION='us-east-1'
+    *aws credentials
+
+
+    plugins used
+    * kubernetes
+    * kubernetes cli
+    * aws credentials > aws configure get aws_access_key_id
+                        aws configure get aws_secret_access_key
+    * terraform:1.4.6
+
+
+
+    terraform add plugins and syntax snippet generator  to use tool 
+
