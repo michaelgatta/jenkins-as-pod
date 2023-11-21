@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        kubernetes {
+        mike {
             // Your Kubernetes configuration here
             yaml """
 apiVersion: v1
