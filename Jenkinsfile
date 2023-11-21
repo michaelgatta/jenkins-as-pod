@@ -1,7 +1,7 @@
 pipeline {
      agent {
         kubernetes {
-			inheritFrom 'jenkins-agent'
+			inheritFrom 'jenkins'
 			idleMinutes 5
 			yamlFile 'build-pod.yaml'
 			defaultContainer 'custom-agent'
