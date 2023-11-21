@@ -37,4 +37,3 @@ spec:
       emptyDir: {}
     - name: dind-certs
       emptyDir: {}
-      
