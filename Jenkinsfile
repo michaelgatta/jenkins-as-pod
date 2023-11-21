@@ -1,63 +1,48 @@
 pipeline {
     agent {
         kubernetes {
-            label 'jenkins-agent'
-            yamlFile 'build-pod.yaml'
+            // Your Kubernetes configuration here
+            yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: some-label-value
+  name: jenkins-agent
+spec:
+  containers:
+  - name: maven
+    image: maven:3.8.4
+    command:
+    - cat
+    tty: true
+"""
         }
-    }
-
-    environment {
-        AWS_DEFAULT_REGION = 'us-east-1'
-        AWS_CREDENTIALS = credentials('aws-auth')
-        PATH = "${PATH}:${getTerraformPath()}"
     }
 
     stages {
-        stage('git clone') {
+        stage('Build') {
             steps {
-                sh "echo love"
-            }
-        }
-
-        stage('create s3') {
-            steps {
-                script {
-                    createS3Bucket('s3molo')
+                container('maven') {
+                    sh 'mvn clean install'
                 }
             }
         }
 
-        stage('create ecr') {
+        stage('Test') {
             steps {
-                script {
-                    createECR('mike00000')
+                container('maven') {
+                    sh 'mvn test'
                 }
             }
         }
 
-        stage('create dynamo') {
+        stage('Deploy') {
             steps {
-                script {
-                    createDynamoDB('dynamodbName')
+                container('maven') {
+                    sh 'mvn deploy'
                 }
             }
         }
     }
-}
-
-def createECR(repoName) {
-    sh returnStatus: true, script: "aws ecr create-repository --repository-name ${repoName} --image-scanning-configuration scanOnPush=true --region ${AWS_DEFAULT_REGION}"
-}
-
-def createS3Bucket(bucketName) {
-    sh returnStatus: true, script: "aws s3 mb s3://${bucketName} --region=${AWS_DEFAULT_REGION}"
-}
-
-def createDynamoDB(dynamodbName) {
-    sh returnStatus: true, script: "aws dynamodb create-table --table-name ${dynamodbName} --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5"
-}
-
-def getTerraformPath() {
-    def tfHome = tool name: 'terraform:1.4.6', type: 'terraform'
-    return tfHome
 }
