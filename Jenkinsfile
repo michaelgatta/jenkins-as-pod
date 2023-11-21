@@ -1,6 +1,12 @@
 pipeline {
-    agent any
-    
+    agent {
+        kubernetes {
+            inheritFrom 'jenkins'
+            idleMinutes 5
+            yamlFile 'build-pod.yaml'
+            defaultContainer 'custom-agent'
+        }
+    }
 
     environment {
         AWS_DEFAULT_REGION = 'us-east-1'
