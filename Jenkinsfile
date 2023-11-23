@@ -84,7 +84,7 @@ pipeline {
 						// sh 'envsubst < kjavaapps.yaml | kubectl apply -f -'
 					}
                 }
-            }
+            
     }
 }
 
@@ -109,4 +109,4 @@ def REGISTRY_ID
 
 def REPOSITORY_NAME
 
-def REPOSITORY_URL
+def REPOSITORY_URL = null
