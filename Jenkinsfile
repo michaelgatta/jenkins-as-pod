@@ -15,7 +15,7 @@ pipeline{
         IMAGE_REPO_NAME='mike00000'
         IMAGE_TAG='latest'
         REPOSITORY_URL="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
-        PATH = "${PATH}:${getTerraformPath()}"
+        // PATH = "${PATH}:${getTerraformPath()}"
     }
 
     stages{
