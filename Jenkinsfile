@@ -1,61 +1,65 @@
 pipeline {
-
-  agent {
-
-    kubernetes {
-
-      label 'my-kubernetes-agent'
-
+    agent {
+        kubernetes {
+            inheritFrom 'jenkins'
+            idleMinutes 5
+            yamlFile 'build-pod.yaml'
+            defaultContainer 'custom-agent'
+        }
     }
 
-  }
-
-  
-
-  stages {
-
-    stage('Clone repository') {
-
-      steps {
-
-        git 'https://github.com/your-repo.git'
-
-      }
-
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-1'
+        AWS_CREDENTIALS = credentials('aws-auth')
+        PATH = "${PATH}:${getTerraformPath()}"
     }
 
-    
+    stages {
+        stage('git clone') {
+            steps {
+                sh "echo love"
+            }
+        }
 
-    stage('Build and push Docker image') {
+        stage('create s3') {
+            steps {
+                script {
+                    createS3Bucket('s3molo')
+                }
+            }
+        }
 
-      steps {
+        stage('create ecr') {
+            steps {
+                script {
+                    createECR('mike00000')
+                }
+            }
+        }
 
-        sh 'docker build -t my-image:latest .'
-
-        sh 'docker push my-image:latest'
-
-      }
-
+        stage('create dynamo') {
+            steps {
+                script {
+                    createDynamoDB('dynamodbName')
+                }
+            }
+        }
     }
+}
 
-    
+def createECR(repoName) {
+    sh returnStatus: true, script: "aws ecr create-repository --repository-name ${repoName} --image-scanning-configuration scanOnPush=true --region ${AWS_DEFAULT_REGION}"
+}
 
-    stage('Deploy to Kubernetes') {
+def createS3Bucket(bucketName) {
+    sh returnStatus: true, script: "aws s3 mb s3://${bucketName} --region=${AWS_DEFAULT_REGION}"
+}
 
-      steps {
+def createDynamoDB(dynamodbName) {
+    sh returnStatus: true, script: "aws dynamodb create-table --table-name ${dynamodbName} --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5"
+}
 
-        kubernetesDeploy(
-
-          configs: 'kubernetes/deployment.yaml',
-
-          kubeconfigId: 'my-kubeconfig'
-
-        )
-
-      }
-
-    }
-
-  }
-
+def getTerraformPath() {
+    def tfHome = tool name: 'terraform:1.4.6', type: 'terraform'
+    return tfHome
 }
