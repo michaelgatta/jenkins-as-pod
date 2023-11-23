@@ -32,9 +32,8 @@ pipeline{
 
         stage('docker build'){
             steps{
-                script{
-                    sh "docker build -t mike00000 ."
-                }
+                    sh 'docker build -t mike00000 .'
+                
             }
 
             stage('push'){
