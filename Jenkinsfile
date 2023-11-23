@@ -36,6 +36,13 @@ pipeline{
                     sh "docker build -t mike00000 ."
                 }
             }
+
+            stage('push'){
+                steps{
+                    
+                }
+            }
+    
         }
 
              stage("k8s Deployment"){

@@ -1,9 +1,5 @@
-FROM openjdk:11 AS buildstage 
+FROM python:3.10
+ENV PYTHONUNBUFFERED 1
 COPY . /app
 WORKDIR /app
-RUN javac Hello.java
-FROM openjdk:11-jre-slim
-COPY --from=buildstage /app/Hello.class /app/
-WORKDIR /app
-EXPOSE 3000
-CMD java Hello
+CMD python3 server.py
