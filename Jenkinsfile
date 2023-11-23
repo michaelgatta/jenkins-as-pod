@@ -14,13 +14,6 @@ pipeline {
         PATH = "${PATH}:${getTerraformPath()}"
     }
 
-    stages {
-        stage('git clone') {
-            steps {
-                sh "echo love"
-            }
-        }
-
         stage('create s3') {
             steps {
                 script {
@@ -57,8 +50,10 @@ pipeline {
                         REPOSITORY_NAME = sh(returnStdout: true, script: "terraform output repository_name").trim()
                         REPOSITORY_URL = sh(returnStdout: true, script: "terraform output repository_url").trim()
                     }
+                
                 }
-
+            }
+        }
                 
 		stage("AWS ECR Authentication") {
 			steps{
@@ -74,7 +69,9 @@ pipeline {
 				sh "docker image rmi -f ${REPOSITORY_NAME}:${BUILD_ID}"
 				sh "docker image rmi -f ${REPOSITORY_URL}:${BUILD_ID}"
 			}
-
+                }
+            }
+        }
             stage("k8s Deployment"){
 			steps {
 				script {
@@ -105,3 +102,10 @@ def getTerraformPath() {
     return tfHome
 }
 
+
+def REGISTRY_ID 
+
+def REPOSITORY_NAME
+
+def REPOSITORY_URL
+}
