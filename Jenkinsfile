@@ -39,7 +39,10 @@ pipeline{
 
             stage('push'){
                 steps{
-                    
+                    script{
+                    sh "docker tag mike00000:latest 581426944935.dkr.ecr.us-east-1.amazonaws.com/mike00000:latest"
+                    sh "docker push 581426944935.dkr.ecr.us-east-1.amazonaws.com/mike00000:latest"
+                    }
                 }
             }
     
