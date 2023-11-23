@@ -7,6 +7,14 @@ pipeline{
 			defaultContainer 'custom-agent'
 		}
 	}
+
+    stages{
+        stage('welcome'){
+            steps{
+                sh "echo love"
+            }
+        }
+    }
 }
 
     
