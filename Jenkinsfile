@@ -105,6 +105,3 @@ def getTerraformPath() {
     return tfHome
 }
 
-def REGISTRY_ID 
-def REPOSITORY_NAME
-def REPOSITORY_URL 
