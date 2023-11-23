@@ -21,16 +21,19 @@ pipeline{
     stages{
         stage('authen'){
             steps{
-                script{
-                     sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-                }
+                script {
+    withCredentials([usernamePassword(credentialsId: 'aws-auth', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+        sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 581426944935.dkr.ecr.us-east-1.amazonaws.com"
+    }
+}
+
             }
         }
 
         stage('docker build'){
             steps{
                 script{
-                    sh "docker build -t${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                    sh "docker build -t mike00000 ."
                 }
             }
         }
