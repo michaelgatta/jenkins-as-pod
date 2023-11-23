@@ -84,6 +84,7 @@ pipeline {
 						// sh 'envsubst < kjavaapps.yaml | kubectl apply -f -'
 					}
                 }
+            }
     }
 }
 
