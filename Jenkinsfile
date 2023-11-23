@@ -1,65 +1,61 @@
 pipeline {
-    agent {
-            kubernetes {
-            inheritFrom 'jenkins'
-            idleMinutes 5
-            yamlFile 'build-pod.yaml'
-            defaultContainer 'custom-agent'
-        }
+
+  agent {
+
+    kubernetes {
+
+      label 'my-kubernetes-agent'
+
     }
 
-    environment {
-        AWS_DEFAULT_REGION = 'us-east-1'
-        AWS_CREDENTIALS = credentials('aws-auth')
-        PATH = "${PATH}:${getTerraformPath()}"
+  }
+
+  
+
+  stages {
+
+    stage('Clone repository') {
+
+      steps {
+
+        git 'https://github.com/your-repo.git'
+
+      }
+
     }
 
-    stages {
-        stage('git clone') {
-            steps {
-                sh "echo love"
-            }
-        }
+    
 
-        stage('create s3') {
-            steps {
-                script {
-                    createS3Bucket('s3molo')
-                }
-            }
-        }
+    stage('Build and push Docker image') {
 
-        stage('create ecr') {
-            steps {
-                script {
-                    createECR('mike00000')
-                }
-            }
-        }
+      steps {
 
-        stage('create dynamo') {
-            steps {
-                script {
-                    createDynamoDB('dynamodbName')
-                }
-            }
-        }
+        sh 'docker build -t my-image:latest .'
+
+        sh 'docker push my-image:latest'
+
+      }
+
     }
-}
 
-def createECR(repoName) {
-    sh returnStatus: true, script: "aws ecr create-repository --repository-name ${repoName} --image-scanning-configuration scanOnPush=true --region ${AWS_DEFAULT_REGION}"
-}
+    
 
-def createS3Bucket(bucketName) {
-    sh returnStatus: true, script: "aws s3 mb s3://${bucketName} --region=${AWS_DEFAULT_REGION}"
-}
+    stage('Deploy to Kubernetes') {
 
-def createDynamoDB(dynamodbName) {
-    sh returnStatus: true, script: "aws dynamodb create-table --table-name ${dynamodbName} --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5"
-}
+      steps {
 
-def getTerraformPath() {
-    def tfHome = tool name: 'terraform:1.4.6', type: 'terraform'
-    return tfHome
+        kubernetesDeploy(
+
+          configs: 'kubernetes/deployment.yaml',
+
+          kubeconfigId: 'my-kubeconfig'
+
+        )
+
+      }
+
+    }
+
+  }
+
 }
