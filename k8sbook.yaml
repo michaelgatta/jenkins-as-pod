@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: k8sbook
-        image: nigelpoulton/k8sbook:1.0
+        image: 581426944935.dkr.ecr.us-east-1.amazonaws.com/mike00000:latest
         ports:
         - containerPort: 8080
 --- 
